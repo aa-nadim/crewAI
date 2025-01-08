@@ -1,21 +1,22 @@
 # crew.py
 
-from crewai import Crew,Process
-from agents import blog_researcher,blog_writer
-from tasks import research_task,write_task
+# Warning control
+import warnings
+warnings.filterwarnings('ignore')
 
 
-# Forming the tech-focused crew with some enhanced configurations
+from crewai import Agent, Task, Crew
+from agents import planner, writer, editor
+from tasks import plan, write, edit
+
+from IPython.display import Markdown
+
+# Initialize Crew with verbose as a boolean value
 crew = Crew(
-  agents=[blog_researcher, blog_writer],
-  tasks=[research_task, write_task],
-  process=Process.sequential,  # Optional: Sequential task execution is default
-  memory=True,
-  cache=True,
-  max_rpm=100,
-  share_crew=True
+    agents=[planner, writer, editor],
+    tasks=[plan, write, edit],
+    verbose=True  # Change 2 to True or False
 )
 
-## start the task execution process with enhanced feedback
-result=crew.kickoff(inputs={'topic':'AI VS ML VS DL vs Data Science'})
-print(result)
+result = crew.kickoff(inputs={"topic": "Artificial Intelligence"})
+Markdown(result)

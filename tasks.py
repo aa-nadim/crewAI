@@ -1,28 +1,60 @@
 # tasks.py
 
 from crewai import Task
-from tools import yt_tool
-from agents import blog_researcher,blog_writer
+from agents import planner, writer, editor
 
-## Research Task
-research_task = Task(
-  description=(
-    "Identify the video {topic}."
-    "Get detailed information about the video from the channel video."
-  ),
-  expected_output='A comprehensive 3 paragraphs long report based on the {topic} of video content.',
-  tools=[yt_tool],
-  agent=blog_researcher,
+# Task for planning content
+plan = Task(
+    description=(
+        "1. Prioritize the latest trends, key players, "
+        "and noteworthy news on {topic}.\n"
+        "2. Identify the target audience, considering "
+        "their interests and pain points.\n"
+        "3. Develop a detailed content outline including "
+        "an introduction, key points, and a call to action.\n"
+        "4. Include SEO keywords and relevant data or sources."
+    ),
+    expected_output=(
+        "A comprehensive content plan document "
+        "with an outline, audience analysis, "
+        "SEO keywords, and resources."
+    ),
+    agent=planner,
 )
 
-# Writing task with language model configuration
-write_task = Task(
-  description=(
-    "get the info from the youtube channel on the topic {topic}."
-  ),
-  expected_output='Summarize the info from the youtube channel video on the topic{topic} and create the content for the blog',
-  tools=[yt_tool],
-  agent=blog_writer,
-  async_execution=False,
-  output_file='new-blog-post.md'  # Example of output customization
+# Task for writing content
+write = Task(
+    description=(
+        "1. Use the content plan to craft a compelling "
+        "blog post on {topic}.\n"
+        "2. Incorporate SEO keywords naturally.\n"
+        "3. Sections/Subtitles are properly named "
+        "in an engaging manner.\n"
+        "4. Ensure the post is structured with an "
+        "engaging introduction, insightful body, "
+        "and a summarizing conclusion.\n"
+        "5. Proofread for grammatical errors and "
+        "alignment with the brand's voice.\n"
+    ),
+    expected_output=(
+        "A well-written blog post "
+        "in markdown format, ready for publication, "
+        "each section should have 2 or 3 paragraphs."
+    ),
+    agent=writer,
+)
+
+# Task for editing content
+edit = Task(
+    description=(
+        "Proofread the given blog post for "
+        "grammatical errors and "
+        "alignment with the brand's voice."
+    ),
+    expected_output=(
+        "A well-written blog post in markdown format, "
+        "ready for publication, "
+        "each section should have 2 or 3 paragraphs."
+    ),
+    agent=editor,
 )

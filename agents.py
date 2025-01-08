@@ -1,51 +1,78 @@
 # agents.py
 
 from crewai import Agent
-from tools import yt_tool
-
 from dotenv import load_dotenv
+import os
+from utils import get_openai_api_key
+import litellm
 
+# Load environment variables from a .env file
 load_dotenv()
 
+# Set OpenAI API key and model name
+openai_api_key = get_openai_api_key()
+os.environ["OPENAI_MODEL_NAME"] = 'gpt-3.5-turbo'
 
-import os
-os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
-os.environ["OPENAI_MODEL_NAME"]="gpt-3.5-turbo"
+# Set litellm to verbose mode
+litellm.set_verbose = True
 
-
-import litellm
-litellm.set_verbose=True
-
-## Create a senior blog content researcher
-
-blog_researcher=Agent(
-    role='Blog Researcher from Youtube Videos',
-    goal='get the relevant video transcription for the topic {topic} from the provided Yt channel',
-    verboe=True,
-    memory=True,
-    model_name="gpt-3.5-turbo",
+# Create a senior blog content researcher agent
+planner = Agent(
+    role="Content Planner",
+    goal="Plan engaging and factually accurate content on {topic}",
     backstory=(
-       "Expert in understanding videos in AI Data Science , MAchine Learning And GEN AI and providing suggestion" 
+        "You're working on planning a blog article "
+        "about the topic: {topic}. "
+        "You collect information that helps the "
+        "audience learn something "
+        "and make informed decisions. "
+        "Your work is the basis for "
+        "the Content Writer to write an article on this topic."
     ),
-    tools=[yt_tool],
-    allow_delegation=True
+    allow_delegation=False,
+    verbose=True
 )
 
-## creating a senior blog writer agent with YT tool
-
-blog_writer=Agent(
-    role='Blog Writer',
-    goal='Narrate compelling tech stories about the video {topic} from YT video',
-    verbose=True,
-    memory=True,
-    model_name="gpt-3.5-turbo",
+# Create a senior blog writer agent with YT tool
+writer = Agent(
+    role="Content Writer",
+    goal="Write insightful and factually accurate "
+         "opinion piece about the topic: {topic}",
     backstory=(
-        "With a flair for simplifying complex topics, you craft"
-        "engaging narratives that captivate and educate, bringing new"
-        "discoveries to light in an accessible manner."
+        "You're working on a writing "
+        "a new opinion piece about the topic: {topic}. "
+        "You base your writing on the work of "
+        "the Content Planner, who provides an outline "
+        "and relevant context about the topic. "
+        "You follow the main objectives and "
+        "direction of the outline, "
+        "as provide by the Content Planner. "
+        "You also provide objective and impartial insights "
+        "and back them up with information "
+        "provide by the Content Planner. "
+        "You acknowledge in your opinion piece "
+        "when your statements are opinions "
+        "as opposed to objective statements."
     ),
-    tools=[yt_tool],
-    allow_delegation=False
+    allow_delegation=False,
+    verbose=True
+)
 
-
+# Create an editor agent
+editor = Agent(
+    role="Editor",
+    goal="Edit a given blog post to align with "
+         "the writing style of the organization.",
+    backstory=(
+        "You are an editor who receives a blog post "
+        "from the Content Writer. "
+        "Your goal is to review the blog post "
+        "to ensure that it follows journalistic best practices, "
+        "provides balanced viewpoints "
+        "when providing opinions or assertions, "
+        "and also avoids major controversial topics "
+        "or opinions when possible."
+    ),
+    allow_delegation=False,
+    verbose=True
 )
