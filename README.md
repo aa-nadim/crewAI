@@ -9,7 +9,10 @@
     bash Miniconda3-latest-Linux-x86_64.sh
 ```
 
+```bash
+    ollama pull llama2:7b
 
+```
 
 
 ```bash
