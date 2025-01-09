@@ -6,7 +6,7 @@ from IPython.display import Markdown
 warnings.filterwarnings('ignore')
 
 llm = LLM(
-    model="ollama/llama2:7b",
+    model="ollama/llama3.2:1b",
     base_url="http://localhost:11434"
 )
 
@@ -113,8 +113,7 @@ edit = Task(
 
 crew = Crew(
     agents=[planner, writer, editor],
-    tasks=[plan, write, edit],
-    verbose=True  # Set verbose to True or False
+    tasks=[plan, write, edit]
 )
 
 result = crew.kickoff(inputs={"topic": "Machine Learning"})
