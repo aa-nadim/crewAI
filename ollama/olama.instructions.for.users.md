@@ -35,7 +35,6 @@ docker exec -it ollama /bin/bash
 ollama pull mistral:instruct 
 ollama pull llama3.2:1b
 
-ollama pull llama2:7b
 ```
 
 - lists all available model

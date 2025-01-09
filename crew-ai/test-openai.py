@@ -8,22 +8,28 @@ import time
 warnings.filterwarnings('ignore')
 
 
-load_dotenv()
-# Configure OpenAI API
-os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
-os.environ["OPENAI_MODEL_NAME"] = 'gpt-3.5-turbo' 
+# load_dotenv()
+# # Configure OpenAI API
+# os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
+# os.environ["OPENAI_MODEL_NAME"] = 'gpt-3.5-turbo' 
 
-# Configure LLM with optimized parameters
-llm = LLM(
-    model="gpt-3.5-turbo",  
-    temperature=0.7,
-    max_tokens=100,
-    top_p=0.8,
-    frequency_penalty=0.0,
-    presence_penalty=0.0,
-    stop=["END"],
-    seed=42
-)
+# # Configure LLM with optimized parameters
+# llm = LLM(
+#     model="gpt-3.5-turbo",  
+#     temperature=0.7,
+#     max_tokens=100,
+#     top_p=0.8,
+#     frequency_penalty=0.0,
+#     presence_penalty=0.0,
+#     stop=["END"],
+#     seed=42
+# )
+
+llm = LLM( 
+            model="gpt-4o", 
+            base_url="https://openai.prod.ai-gateway.quantumblack.com/0b0e19f0-3019-4d9e-bc36-1bd53ed23dc2/v1", 
+            api_key="5f393389-5fc3-4904-a597-dd56e3b00f42:7ggTi5OqYeCqlLm1PmJ9kkAVk69iWuWI"
+        )
 
 # Define Agents with the configured LLM
 planner = Agent(

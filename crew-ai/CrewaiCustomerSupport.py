@@ -9,7 +9,7 @@ warnings.filterwarnings('ignore')
 
 # Define LLM
 llm = LLM(
-    model="ollama/llama2:7b",
+    model="ollama/llama3.2:1b",
     base_url="http://localhost:11434"
 )
 

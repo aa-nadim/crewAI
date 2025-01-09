@@ -1,4 +1,3 @@
-# Warning control
 import warnings
 from crewai import LLM, Agent, Task, Crew
 from dotenv import load_dotenv
@@ -8,23 +7,26 @@ warnings.filterwarnings('ignore')
 
 load_dotenv()
 
-os.environ["GIMINI_API_KEY"] = os.getenv("GIMINI_API_KEY")
+# os.environ["GIMINI_API_KEY"] = os.getenv("GIMINI_API_KEY")
+# os.environ["GIMINI_MODEL_NAME"] = 'gemini-1.5-flash'
 
-os.environ["GIMINI_MODEL_NAME"] = 'gemini-2.0-flash-exp'
+# llm = LLM(
+#     model="gemini-1.5-flash",
+#     temperature=0.8,
+#     max_tokens=150,
+#     top_p=0.9,
+#     frequency_penalty=0.1,
+#     presence_penalty=0.1,
+#     stop=["END"],
+#     seed=42
+# )
 
-llm = LLM(
-    model="gemini-2.0-flash-exp",
-    temperature=0.8,
-    max_tokens=150,
-    top_p=0.9,
-    frequency_penalty=0.1,
-    presence_penalty=0.1,
-    stop=["END"],
-    seed=42
-)
+llm = LLM( 
+            model="gpt-4o", 
+            base_url="https://openai.prod.ai-gateway.quantumblack.com/0b0e19f0-3019-4d9e-bc36-1bd53ed23dc2/v1", 
+            api_key="5f393389-5fc3-4904-a597-dd56e3b00f42:7ggTi5OqYeCqlLm1PmJ9kkAVk69iWuWI"
+        )
 
-
-# Define Agents with the configured LLM
 planner = Agent(
     role="Content Planner",
     goal="Plan engaging and factually accurate content on {topic}",
@@ -36,15 +38,15 @@ planner = Agent(
               "Your work is the basis for "
               "the Content Writer to write an article on this topic.",
     allow_delegation=False,
-    verbose=True,
-    llm=llm  # Explicitly pass the LLM configuration
+    llm=llm,
+    verbose=True  # Set verbose to True or False
 )
 
 writer = Agent(
     role="Content Writer",
     goal="Write insightful and factually accurate "
          "opinion piece about the topic: {topic}",
-    backstory="You're working on writing "
+    backstory="You're working on a writing "
               "a new opinion piece about the topic: {topic}. "
               "You base your writing on the work of "
               "the Content Planner, who provides an outline "
@@ -59,8 +61,8 @@ writer = Agent(
               "when your statements are opinions "
               "as opposed to objective statements.",
     allow_delegation=False,
-    verbose=True,
-    llm=llm  # Explicitly pass the LLM configuration
+    llm=llm,
+    verbose=True  # Set verbose to True or False
 )
 
 editor = Agent(
@@ -76,11 +78,10 @@ editor = Agent(
               "and also avoids major controversial topics "
               "or opinions when possible.",
     allow_delegation=False,
-    verbose=True,
-    llm=llm  # Explicitly pass the LLM configuration
+    llm=llm,
+    verbose=True  # Set verbose to True or False
 )
 
-# Rest of your task definitions remain the same
 plan = Task(
     description=(
         "1. Prioritize the latest trends, key players, "
@@ -94,7 +95,8 @@ plan = Task(
     expected_output="A comprehensive content plan document "
         "with an outline, audience analysis, "
         "SEO keywords, and resources.",
-    agent=planner
+    agent=planner,
+    max_retries=2  
 )
 
 write = Task(
@@ -113,68 +115,26 @@ write = Task(
     expected_output="A well-written blog post "
         "in markdown format, ready for publication, "
         "each section should have 2 or 3 paragraphs.",
-    agent=writer
+    agent=writer,
+    max_retries=2  
 )
 
 edit = Task(
-    description=(
-        "1. Review the blog post for clarity, coherence, and flow.\n"
-        "2. Check for grammatical errors and style consistency.\n"
-        "3. Ensure content aligns with brand voice and guidelines.\n"
-        "4. Verify facts and sources where applicable.\n"
-        "5. Optimize formatting and structure for readability."
-    ),
-    expected_output="A polished, publication-ready blog post "
-                    "in markdown format, thoroughly reviewed "
-                    "for quality and accuracy.",
-    agent=editor
+    description=("Proofread the given blog post for "
+                 "grammatical errors and "
+                 "alignment with the brand's voice."),
+    expected_output="A well-written blog post in markdown format, "
+                    "ready for publication, "
+                    "each section should have 2 or 3 paragraphs.",
+    agent=editor,
+    max_retries=2  
 )
 
-# Create Crew
 crew = Crew(
     agents=[planner, writer, editor],
-    tasks=[plan, write, edit],
-    verbose=True
+    tasks=[plan, write, edit]
 )
 
-def execute_crew_task(topic):
-    """
-    Execute the CrewAI task with error handling and retries
-    """
-    max_retries = 3
-    retry_count = 0
-    
-    while retry_count < max_retries:
-        try:
-            print(f"Attempt {retry_count + 1} of {max_retries}")
-            result = crew.kickoff(inputs={"topic": topic})
-            print("Task completed successfully!")
-            return result
-        except Exception as e:
-            retry_count += 1
-            if retry_count == max_retries:
-                print(f"Failed after {max_retries} attempts. Error: {str(e)}")
-                raise
-            print(f"Attempt {retry_count} failed. Retrying after delay...")
-            time.sleep(2)  # Add delay between retries
+result = crew.kickoff(inputs={"topic": "Machine Learning"})
 
-def main():
-    try:
-        # Example usage
-        topic = "Machine Learning"  # You can change this topic
-        result = execute_crew_task(topic)
-        
-        # Display the result
-        print("\nFinal Output:")
-        print(Markdown(result.raw))
-        
-        # Optionally save the output to a file
-        with open(f"{topic.lower().replace(' ', '_')}_blog.md", "w", encoding="utf-8") as f:
-            f.write(result.raw)
-            
-    except Exception as e:
-        print(f"An error occurred: {str(e)}")
-        print("Please check your API key and quota limits.")
-
-if __name__ == "__main__":
-    main()
+Markdown(result.raw)
