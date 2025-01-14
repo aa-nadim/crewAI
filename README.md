@@ -61,4 +61,21 @@ python support-data-insight-analysis.py
 cd practical-multi-ai-agents/005_content-creation-at-scale
 python content-creation-at-scale.py
 
+
+#006
+cd practical-multi-ai-agents/006_blog-post-crew-in-production
+
+deactivate
+python3 -m venv .venv
+source .venv/bin/activate
+source .venv/Scripts/activate # for windows
+
+pip install crewai
+crewai create crew new_project
+
+cd new_project
+
+crewai install
+crewai run
+
 ``

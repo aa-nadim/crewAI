@@ -50,7 +50,7 @@ class DocumentationCrawler:
 class DocumentationChatbot:
     def __init__(self, base_url: str):
         self.llm = LLM(
-            model="ollama/llama2:7b",
+            model="ollama/llama3.2:1b",
             base_url="http://localhost:11434"
         )
         
