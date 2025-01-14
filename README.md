@@ -1,59 +1,39 @@
 # Crew-AI
 
-## Instalation
+```bash
 
-### Linux
+python3 -m venv .venv
+source .venv/bin/activate
+
+source .venv/Scripts/activate # for windows
+
+
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+## Muti AI Agent Run
 
 ```bash
-    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-    bash Miniconda3-latest-Linux-x86_64.sh
+# 001
+python multi-ai-agent/001_create-agents-to-research-and-write-an-article/research-and-write.py
+
+#002
+python multi-ai-agent/002_multi-agent-customer-support-automation/customer-support.py
+
+#003
+python multi-ai-agent/003_tools-for-a-customer-outreach-campaign/customer-outreach-campaign.py
+
+#004
+cd multi-ai-agent/004_automate-event-planning
+python automate-event-planning.py
+
+#005
+cd../cd..
+python multi-ai-agent/005_mutli-agent-collaboration-for-financial-analysis/financial-analysis.py
+
+#006
+cd multi-ai-agent/006_build-a-crew-to-trailor-job-applications/
+python job-applications.py
+
 ```
-
-```bash
-    ollama pull llama2:7b
-
-```
-
-
-```bash
-    pip install -r requirements.txt
-
-    python test.py
-``` 
-
-## Ollama using Docker.Compose
-```bash
-    version: '3.8'
-    services:
-    ollama:
-        image: ollama/ollama:latest
-        container_name: ollama
-        ports:
-        - "11434:11434"
-        volumes:
-        - ./ollama:/root/.ollama
-        restart: unless-stopped
-        command: serve
-```
-Create a docker-compose.yml file with above content
-```
-docker-compose up -d
-```
-Access olama on the exposed port.
-To load Model using olama docker
-
-get inside Ollama docker
-
-docker exec -it ollama /bin/bash
-pull and load a model
-```bash
-ollama pull mistral:instruct
-ollama pull llama3
-lists all available model
-
-ollama list
-remove a model
-
-ollama rm llama3
-```
-You can use any other method to load load a model.

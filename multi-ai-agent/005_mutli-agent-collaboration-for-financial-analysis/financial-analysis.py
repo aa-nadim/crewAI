@@ -1,20 +1,28 @@
-import warnings
-from crewai import LLM, Agent, Task, Crew
+# Warning control
 from IPython.display import Markdown
 from crewai_tools import ScrapeWebsiteTool, SerperDevTool
-from crewai import Crew, Process
-from langchain_openai import ChatOpenAI
+from crewai import LLM, Agent, Task, Crew, Process
+import os
+import warnings
+warnings.filterwarnings('ignore')
+
+
+os.environ["SERPER_API_KEY"] = "ebf2218969d785f46bed48d0b2bc0cd4232b8642"
+
+# llm = LLM(
+#     model="ollama/llama3.2",
+#     base_url="http://localhost:11434"
+# )
+
+llm = LLM(
+    model="gpt-4o",
+    base_url="https://openai.prod.ai-gateway.quantumblack.com/0b0e19f0-3019-4d9e-bc36-1bd53ed23dc2/v1",
+    api_key="5f393389-5fc3-4904-a597-dd56e3b00f42:7ggTi5OqYeCqlLm1PmJ9kkAVk69iWuWI"
+)
+
 
 search_tool = SerperDevTool()
 scrape_tool = ScrapeWebsiteTool()
-
-warnings.filterwarnings('ignore')
-
-llm = LLM( 
-            model="gpt-3.5-turbo", 
-            base_url="https://openai.prod.ai-gateway.quantumblack.com/0b0e19f0-3019-4d9e-bc36-1bd53ed23dc2/v1", 
-            api_key="5f393389-5fc3-4904-a597-dd56e3b00f42:7ggTi5OqYeCqlLm1PmJ9kkAVk69iWuWI"
-        )
 
 data_analyst_agent = Agent(
     role="Data Analyst",
@@ -26,8 +34,9 @@ data_analyst_agent = Agent(
               "the Data Analyst Agent is the cornerstone for "
               "informing trading decisions.",
     verbose=True,
+    llm=llm,
     allow_delegation=True,
-    tools = [scrape_tool, search_tool]
+    tools=[scrape_tool, search_tool]
 )
 
 trading_strategy_agent = Agent(
@@ -40,8 +49,9 @@ trading_strategy_agent = Agent(
               "the performance of different approaches to determine "
               "the most profitable and risk-averse options.",
     verbose=True,
+    llm=llm,
     allow_delegation=True,
-    tools = [scrape_tool, search_tool]
+    tools=[scrape_tool, search_tool]
 )
 
 execution_agent = Agent(
@@ -54,8 +64,9 @@ execution_agent = Agent(
               "when and how trades should be executed to maximize "
               "efficiency and adherence to strategy.",
     verbose=True,
+    llm=llm,
     allow_delegation=True,
-    tools = [scrape_tool, search_tool]
+    tools=[scrape_tool, search_tool]
 )
 
 risk_management_agent = Agent(
@@ -68,8 +79,9 @@ risk_management_agent = Agent(
               "risk exposure and suggests safeguards to ensure that "
               "trading activities align with the firm’s risk tolerance.",
     verbose=True,
+    llm=llm,
     allow_delegation=True,
-    tools = [scrape_tool, search_tool]
+    tools=[scrape_tool, search_tool]
 )
 
 # Task for Data Analyst Agent: Analyze Market Data
@@ -131,20 +143,20 @@ risk_assessment_task = Task(
     agent=risk_management_agent,
 )
 
+
 # Define the crew with agents and tasks
 financial_trading_crew = Crew(
-    agents=[data_analyst_agent, 
-            trading_strategy_agent, 
-            execution_agent, 
+    agents=[data_analyst_agent,
+            trading_strategy_agent,
+            execution_agent,
             risk_management_agent],
-    
-    tasks=[data_analysis_task, 
-           strategy_development_task, 
-           execution_planning_task, 
+
+    tasks=[data_analysis_task,
+           strategy_development_task,
+           execution_planning_task,
            risk_assessment_task],
-    
-    manager_llm=ChatOpenAI(model="gpt-3.5-turbo", 
-                           temperature=0.7),
+
+    manager_llm=llm,
     process=Process.hierarchical,
     verbose=True
 )
@@ -158,7 +170,13 @@ financial_trading_inputs = {
     'news_impact_consideration': True
 }
 
-### this execution will take some time to run
+# this execution will take some time to run
 result = financial_trading_crew.kickoff(inputs=financial_trading_inputs)
 
-Markdown(result)
+# Markdown(result)
+
+# Convert result to a string representation
+result_text = str(result)
+
+# Use the Markdown function with the string representation
+Markdown(result_text)

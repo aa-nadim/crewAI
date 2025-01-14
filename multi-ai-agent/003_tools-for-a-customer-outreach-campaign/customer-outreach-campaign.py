@@ -1,29 +1,28 @@
+# Warning control
 import os
-import warnings
-from crewai import LLM, Agent, Task, Crew
 from IPython.display import Markdown
-from crewai_tools import DirectoryReadTool, FileReadTool, SerperDevTool
-from crewai_tools import RagTool 
-from dotenv import load_dotenv
-
-# Load environment variables from a .env file
-load_dotenv()
-
-# Get the OpenAI API key from the environment variables
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
-if not OPENAI_API_KEY:
-    raise ValueError("The OpenAI API key is not set. Please check your .env file or environment variables.")
-else:
-    print(f"OpenAI API Key Loaded: {OPENAI_API_KEY[:4]}...{OPENAI_API_KEY[-4:]}")  # Print partial key for debugging
-
+from crewai.tools import BaseTool
+from crewai_tools import DirectoryReadTool, \
+    FileReadTool, \
+    SerperDevTool
+from crewai import LLM, Agent, Task, Crew
+import warnings
 warnings.filterwarnings('ignore')
 
-# Initialize the LLM with the OpenAI API key from the environment variables
+
+# SERPER_API_KEY="ebf2218969d785f46bed48d0b2bc0cd4232b8642"
+
+os.environ["SERPER_API_KEY"] = "ebf2218969d785f46bed48d0b2bc0cd4232b8642"
+
+# llm = LLM(
+#     model="ollama/llama3.2",
+#     base_url="http://localhost:11434"
+# )
+
 llm = LLM(
     model="gpt-4o",
     base_url="https://openai.prod.ai-gateway.quantumblack.com/0b0e19f0-3019-4d9e-bc36-1bd53ed23dc2/v1",
-    api_key=OPENAI_API_KEY
+    api_key="5f393389-5fc3-4904-a597-dd56e3b00f42:7ggTi5OqYeCqlLm1PmJ9kkAVk69iWuWI"
 )
 
 sales_rep_agent = Agent(
@@ -42,6 +41,7 @@ sales_rep_agent = Agent(
         "for meaningful engagements and driving the company's growth."
     ),
     allow_delegation=False,
+    llm=llm,
     verbose=True
 )
 
@@ -60,22 +60,26 @@ lead_sales_rep_agent = Agent(
         "from curiosity to commitment."
     ),
     allow_delegation=False,
+    llm=llm,
     verbose=True
 )
+
 
 directory_read_tool = DirectoryReadTool(directory='./instructions')
 file_read_tool = FileReadTool()
 search_tool = SerperDevTool()
 
-class SentimentAnalysisTool(RagTool):  # Updated base class to RagTool
+
+class SentimentAnalysisTool(BaseTool):
     name: str = "Sentiment Analysis Tool"
     description: str = ("Analyzes the sentiment of text "
-         "to ensure positive and engaging communication.")
-    
+                        "to ensure positive and engaging communication.")
+
     def _run(self, text: str) -> str:
         # Your custom code tool goes here
         return "positive"
-    
+
+
 sentiment_analysis_tool = SentimentAnalysisTool()
 
 lead_profiling_task = Task(
@@ -136,14 +140,13 @@ personalized_outreach_task = Task(
 )
 
 crew = Crew(
-    agents=[sales_rep_agent, 
+    agents=[sales_rep_agent,
             lead_sales_rep_agent],
-    
-    tasks=[lead_profiling_task, 
+
+    tasks=[lead_profiling_task,
            personalized_outreach_task],
-    
-    verbose=True,
-    memory=True
+
+    verbose=True
 )
 
 inputs = {
@@ -155,4 +158,10 @@ inputs = {
 }
 
 result = crew.kickoff(inputs=inputs)
-Markdown(result)
+
+
+# Convert result to a string representation
+result_text = str(result)
+
+# Use the Markdown function with the string representation
+Markdown(result_text)

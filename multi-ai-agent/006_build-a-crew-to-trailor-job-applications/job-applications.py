@@ -1,37 +1,46 @@
-import warnings
+# Warning control
+from IPython.display import Markdown
+from crewai_tools import (
+    FileReadTool,
+    ScrapeWebsiteTool,
+    MDXSearchTool,
+    SerperDevTool
+)
 from crewai import LLM, Agent, Task, Crew
-from IPython.display import Markdown, display
-
+import os
+import warnings
 warnings.filterwarnings('ignore')
 
-llm = LLM( 
-            model="gpt-4o", 
-            base_url="https://openai.prod.ai-gateway.quantumblack.com/0b0e19f0-3019-4d9e-bc36-1bd53ed23dc2/v1", 
-            api_key="5f393389-5fc3-4904-a597-dd56e3b00f42:7ggTi5OqYeCqlLm1PmJ9kkAVk69iWuWI"
-        )
 
-from crewai_tools import (
-  FileReadTool,
-  ScrapeWebsiteTool,
-  MDXSearchTool,
-  SerperDevTool
+os.environ["SERPER_API_KEY"] = "ebf2218969d785f46bed48d0b2bc0cd4232b8642"
+os.environ["OPENAI_API_KEY"] = "5f393389-5fc3-4904-a597-dd56e3b00f42:7ggTi5OqYeCqlLm1PmJ9kkAVk69iWuWI"
+
+# llm = LLM(
+#     model="ollama/llama3.2",
+#     base_url="http://localhost:11434"
+# )
+
+llm = LLM(
+    model="gpt-4o",
+    base_url="https://openai.prod.ai-gateway.quantumblack.com/0b0e19f0-3019-4d9e-bc36-1bd53ed23dc2/v1",
+    api_key="5f393389-5fc3-4904-a597-dd56e3b00f42:7ggTi5OqYeCqlLm1PmJ9kkAVk69iWuWI"
 )
+
+
 
 search_tool = SerperDevTool()
 scrape_tool = ScrapeWebsiteTool()
 read_resume = FileReadTool(file_path='./fake_resume.md')
 semantic_search_resume = MDXSearchTool(mdx='./fake_resume.md')
 
-
-display(Markdown("./fake_resume.md"))
-
 # Agent 1: Researcher
 researcher = Agent(
     role="Tech Job Researcher",
     goal="Make sure to do amazing analysis on "
          "job posting to help job applicants",
-    tools = [scrape_tool, search_tool],
+    tools=[scrape_tool, search_tool],
     verbose=True,
+    llm=llm,
     backstory=(
         "As a Job Researcher, your prowess in "
         "navigating and extracting critical "
@@ -48,9 +57,10 @@ profiler = Agent(
     role="Personal Profiler for Engineers",
     goal="Do increditble research on job applicants "
          "to help them stand out in the job market",
-    tools = [scrape_tool, search_tool,
-             read_resume, semantic_search_resume],
+    tools=[scrape_tool, search_tool,
+           read_resume, semantic_search_resume],
     verbose=True,
+    llm=llm,
     backstory=(
         "Equipped with analytical prowess, you dissect "
         "and synthesize information "
@@ -65,9 +75,10 @@ resume_strategist = Agent(
     role="Resume Strategist for Engineers",
     goal="Find all the best ways to make a "
          "resume stand out in the job market.",
-    tools = [scrape_tool, search_tool,
-             read_resume, semantic_search_resume],
+    tools=[scrape_tool, search_tool,
+           read_resume, semantic_search_resume],
     verbose=True,
+    llm=llm,
     backstory=(
         "With a strategic mind and an eye for detail, you "
         "excel at refining resumes to highlight the most "
@@ -81,9 +92,10 @@ interview_preparer = Agent(
     role="Engineering Interview Preparer",
     goal="Create interview questions and talking points "
          "based on the resume and job requirements",
-    tools = [scrape_tool, search_tool,
-             read_resume, semantic_search_resume],
+    tools=[scrape_tool, search_tool,
+           read_resume, semantic_search_resume],
     verbose=True,
+    llm=llm,
     backstory=(
         "Your role is crucial in anticipating the dynamics of "
         "interviews. With your ability to formulate key questions "
@@ -182,20 +194,28 @@ job_application_crew = Crew(
 
 job_application_inputs = {
     'job_posting_url': 'https://jobs.lever.co/AIFund/6c82e23e-d954-4dd8-a734-c0c2c5ee00f1?lever-origin=applied&lever-source%5B%5D=AI+Fund',
-    'github_url': 'https://github.com/joaomdmoura',
-    'personal_writeup': """Noah is an accomplished Software
-    Engineering Leader with 18 years of experience, specializing in
+    'github_url': 'https://github.com/aa-nadim',
+    'personal_writeup': """Nadim is an accomplished Software
+    Engineering Leader with 15 years of experience, specializing in
     managing remote and in-office teams, and expert in multiple
     programming languages and frameworks. He holds an MBA and a strong
-    background in AI and data science. Noah has successfully led
+    background in AI and data science. Nadim has successfully led
     major tech initiatives and startups, proving his ability to drive
     innovation and growth in the tech industry. Ideal for leadership
     roles that require a strategic and innovative approach."""
 }
 
-### this execution will take a few minutes to run
+# this execution will take a few minutes to run
 result = job_application_crew.kickoff(inputs=job_application_inputs)
 
-display(Markdown("./tailored_resume.md"))
+# from IPython.display import Markdown, display
+# display(Markdown("./tailored_resume.md"))
 
-display(Markdown("./interview_materials.md"))
+# display(Markdown("./interview_materials.md"))
+
+
+# Convert result to a string representation
+result_text = str(result)
+
+# Use the Markdown function with the string representation
+Markdown(result_text)

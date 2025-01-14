@@ -1,15 +1,28 @@
+# Warning control
 import warnings
+warnings.filterwarnings('ignore')
+
+
 from crewai import LLM, Agent, Task, Crew
 from IPython.display import Markdown
 
-warnings.filterwarnings('ignore')
 
-llm = LLM( 
-            model="gpt-4o", 
-            base_url="https://openai.prod.ai-gateway.quantumblack.com/0b0e19f0-3019-4d9e-bc36-1bd53ed23dc2/v1", 
-            api_key="5f393389-5fc3-4904-a597-dd56e3b00f42:7ggTi5OqYeCqlLm1PmJ9kkAVk69iWuWI"
-        )
 
+# llm = LLM(
+#     model="ollama/llama3.2",
+#     base_url="http://localhost:11434"
+# )
+
+llm = LLM(
+    model="gpt-4o", 
+    base_url="https://openai.prod.ai-gateway.quantumblack.com/0b0e19f0-3019-4d9e-bc36-1bd53ed23dc2/v1", 
+    api_key="5f393389-5fc3-4904-a597-dd56e3b00f42:7ggTi5OqYeCqlLm1PmJ9kkAVk69iWuWI" 
+)
+
+
+## Create a new agent
+
+#create planner agent
 planner = Agent(
     role="Content Planner",
     goal="Plan engaging and factually accurate content on {topic}",
@@ -22,9 +35,10 @@ planner = Agent(
               "the Content Writer to write an article on this topic.",
     allow_delegation=False,
     llm=llm,
-    verbose=True  
+	verbose=True
 )
 
+#Create writer agent
 writer = Agent(
     role="Content Writer",
     goal="Write insightful and factually accurate "
@@ -45,9 +59,11 @@ writer = Agent(
               "as opposed to objective statements.",
     allow_delegation=False,
     llm=llm,
-    verbose=True  
+    verbose=True
 )
 
+
+#Create editor agent
 editor = Agent(
     role="Editor",
     goal="Edit a given blog post to align with "
@@ -62,8 +78,11 @@ editor = Agent(
               "or opinions when possible.",
     allow_delegation=False,
     llm=llm,
-    verbose=True  
+    verbose=True
 )
+
+
+#Create a task
 
 plan = Task(
     description=(
@@ -79,15 +98,15 @@ plan = Task(
         "with an outline, audience analysis, "
         "SEO keywords, and resources.",
     agent=planner,
-    max_retries=2  
 )
+
 
 write = Task(
     description=(
         "1. Use the content plan to craft a compelling "
             "blog post on {topic}.\n"
         "2. Incorporate SEO keywords naturally.\n"
-        "3. Sections/Subtitles are properly named "
+		"3. Sections/Subtitles are properly named "
             "in an engaging manner.\n"
         "4. Ensure the post is structured with an "
             "engaging introduction, insightful body, "
@@ -99,7 +118,6 @@ write = Task(
         "in markdown format, ready for publication, "
         "each section should have 2 or 3 paragraphs.",
     agent=writer,
-    max_retries=2  
 )
 
 edit = Task(
@@ -109,15 +127,23 @@ edit = Task(
     expected_output="A well-written blog post in markdown format, "
                     "ready for publication, "
                     "each section should have 2 or 3 paragraphs.",
-    agent=editor,
-    max_retries=2  
+    agent=editor
 )
 
+#Create a crew
 crew = Crew(
     agents=[planner, writer, editor],
     tasks=[plan, write, edit]
 )
 
-result = crew.kickoff(inputs={"topic": "Machine Learning"})
+#Run the crew
+result = crew.kickoff(inputs={"topic": "Artificial Intelligence"})
 
-Markdown(result.raw)
+
+# Markdown(result)
+
+# Assuming result is of type CrewOutput. Convert result to a string representation
+result_text = str(result)
+
+# Use the Markdown function with the string representation
+Markdown(result_text)
