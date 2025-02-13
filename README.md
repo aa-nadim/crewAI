@@ -1,4 +1,4 @@
-# Crew-AI
+# crewAI
 
 ```bash
 
