@@ -1,0 +1,1 @@
+The image features a young Labrador Retriever puppy with light-colored fur on a gravelly surface. The puppy is playfully interacting with a textured, round object, possibly a truffle. The scene is outdoors, with sunlight casting soft shadows, creating a warm and engaging atmosphere. The puppy's curious and playful demeanor is highlighted by its interaction with the object.

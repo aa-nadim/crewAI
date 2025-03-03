@@ -7,18 +7,20 @@ from crewai import LLM, Agent, Task, Crew
 from IPython.display import Markdown
 
 
-
 # llm = LLM(
 #     model="ollama/llama3.2",
 #     base_url="http://localhost:11434"
 # )
 
+# llm = LLM(
+#     model="gpt-4o", 
+#     base_url="https://openai.prod.ai-gateway.quantumblack.com/0b0e19f0-3019-4d9e-bc36-1bd53ed23dc2/v1", 
+#     api_key="5f393389-5fc3-4904-a597-dd56e3b00f42:7ggTi5OqYeCqlLm1PmJ9kkAVk69iWuWI" 
+# )
 llm = LLM(
-    model="gpt-4o", 
-    base_url="https://openai.prod.ai-gateway.quantumblack.com/0b0e19f0-3019-4d9e-bc36-1bd53ed23dc2/v1", 
-    api_key="5f393389-5fc3-4904-a597-dd56e3b00f42:7ggTi5OqYeCqlLm1PmJ9kkAVk69iWuWI" 
+    model="gemini/gemini-1.5-flash",
+    api_key="AIzaSyA2VrDRrDMJnfxtSqMHzafFyS6D4ttvRCc"
 )
-
 
 ## Create a new agent
 
